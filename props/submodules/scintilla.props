@@ -12,4 +12,11 @@
   <PropertyGroup>
     <IncludePath>$(ScintillaDirectory)include\;$(ScintillaDirectory)lexilla\src\;$(IncludePath)</IncludePath>
   </PropertyGroup>
+    <!-- Should not be needed, but MS broke auto-generation of targets -->
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(ScintillaDirectory)bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>      
+      <AdditionalDependencies>liblexilla.lib;libscintilla.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
 </Project>
