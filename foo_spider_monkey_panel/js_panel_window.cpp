@@ -72,6 +72,9 @@ ui_helpers::container_window::class_data& js_panel_window::get_class_data() cons
 
 void js_panel_window::update_script( const char* code )
 {
+    FB2K_console_formatter() << SMP_UNDERSCORE_NAME << ":\n"
+                             << "update_script";
+
     if ( code )
     {
         settings_.script = code;
@@ -875,6 +878,9 @@ void js_panel_window::RepaintBackground( const CRect& updateRc )
 
 bool js_panel_window::script_load( bool isFirstLoad )
 {
+    FB2K_console_formatter() << SMP_UNDERSCORE_NAME << ":\n"
+                             << "script_load";
+
     pfc::hires_timer timer;
     timer.start();
 
@@ -930,6 +936,9 @@ void js_panel_window::script_unload()
 
 void js_panel_window::create_context()
 {
+    FB2K_console_formatter() << SMP_UNDERSCORE_NAME << ":\n"
+                             << "create_context";
+
     delete_context();
 
     bmp_.CreateCompatibleBitmap( hDc_, width_, height_ );
@@ -980,6 +989,9 @@ void js_panel_window::on_erase_background()
 
 void js_panel_window::on_panel_create( HWND hWnd )
 {
+    FB2K_console_formatter() << SMP_UNDERSCORE_NAME << ":\n"
+                             << "on_panel_create";
+
     wnd_ = hWnd;
     hDc_ = wnd_.GetDC();
 
