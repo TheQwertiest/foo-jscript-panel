@@ -269,7 +269,7 @@ void SaveSettings( stream_writer& writer, abort_callback& abort, const PanelSett
                 const auto [path, locationType] = [&path = data.path] {
                     try
                     {
-                        auto fsPath = fs::u8path( path ).lexically_normal();
+                        auto fsPath = fs::absolute( fs::u8path( path ) ).lexically_normal();
 
                         const auto isSubpath = []( const auto& path, const auto& base ) {
                             return ( path.wstring().find( base.lexically_normal().wstring() ) == 0 );
