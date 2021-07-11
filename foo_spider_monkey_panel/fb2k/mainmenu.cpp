@@ -95,7 +95,7 @@ GUID MainMenuCommandsSmp::get_parent()
 }
 void MainMenuCommandsSmp::execute( t_uint32 p_index, service_ptr_t<service_base> )
 {
-    panel::message_manager::instance().post_msg_to_all( static_cast<UINT>( InternalAsyncMessage::main_menu_item ), p_index + 1 );
+    panel::MessageManager::Get().PostMsgToAll( static_cast<UINT>( InternalAsyncMessage::main_menu_item ), p_index + 1 );
 }
 bool MainMenuCommandsSmp::get_display( t_uint32 p_index, pfc::string_base& p_out, t_uint32& p_flags )
 {
