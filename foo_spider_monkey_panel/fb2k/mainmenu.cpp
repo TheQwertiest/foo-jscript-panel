@@ -1,7 +1,7 @@
 #include <stdafx.h>
 
-#include <panel/message_manager.h>
-#include <panel/user_message.h>
+#include <panel/event_js_callback.h>
+#include <panel/event_manager.h>
 
 #include <component_paths.h>
 
@@ -95,7 +95,7 @@ GUID MainMenuCommandsSmp::get_parent()
 }
 void MainMenuCommandsSmp::execute( t_uint32 p_index, service_ptr_t<service_base> )
 {
-    panel::MessageManager::Get().PostMsgToAll( static_cast<UINT>( InternalAsyncMessage::main_menu_item ), p_index + 1 );
+    panel::EventManager::Get().PutEventToAll( panel::GenerateEvent_JsCallback( panel::EventId::kInternalMainMenu, p_index + 1 ) );
 }
 bool MainMenuCommandsSmp::get_display( t_uint32 p_index, pfc::string_base& p_out, t_uint32& p_flags )
 {

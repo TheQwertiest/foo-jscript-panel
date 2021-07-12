@@ -376,6 +376,9 @@
     <ClCompile Include="panel\task_controller.cpp">
       <Filter>panel</Filter>
     </ClCompile>
+    <ClCompile Include="panel\event_js_task.cpp">
+      <Filter>panel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="js_engine\js_engine.h">
@@ -814,7 +817,10 @@
     <ClInclude Include="panel\event_js_callback.h">
       <Filter>panel</Filter>
     </ClInclude>
-    <ClInclude Include="panel\js_callback_invoker.h">
+    <ClInclude Include="panel\event_js_task.h">
+      <Filter>panel</Filter>
+    </ClInclude>
+    <ClInclude Include="panel\ievent_js_forwarder.h">
       <Filter>panel</Filter>
     </ClInclude>
   </ItemGroup>
