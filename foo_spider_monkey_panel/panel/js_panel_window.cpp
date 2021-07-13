@@ -9,6 +9,7 @@
 #include <js_engine/js_container.h>
 #include <panel/drop_action_params.h>
 #include <panel/edit_script.h>
+#include <panel/event_focus.h>
 #include <panel/event_js_callback.h>
 #include <panel/event_manager.h>
 #include <panel/event_mouse.h>
@@ -265,6 +266,24 @@ void js_panel_window::ExecuteJsTask( EventId id, IEvent_JsTask& task )
 
     switch ( id )
     {
+    case EventId::kInputFocus:
+    {
+        const auto pEvent = task.AsFocusEvent();
+        assert( pEvent );
+
+        if ( pEvent->IsFocused() )
+        {
+            selectionHolder_ = ui_selection_manager::get()->acquire();
+        }
+        else
+        {
+            selectionHolder_.release();
+        }
+
+        pEvent->JsExecute( *pJsContainer_ );
+
+        break;
+    }
     case EventId::kMouseLeftButtonUp:
     case EventId::kMouseMiddleButtonUp:
     {
@@ -278,8 +297,8 @@ void js_panel_window::ExecuteJsTask( EventId id, IEvent_JsTask& task )
     {
         const auto autoCapture = qwr::final_action( [] { ReleaseCapture(); } );
 
-        const auto pMouseEvent = task.AsMouseEvent();
-        assert( pMouseEvent );
+        const auto pEvent = task.AsMouseEvent();
+        assert( pEvent );
 
         // Bypass the user code.
         const auto useDefaultContextMenu = [&] {
@@ -289,7 +308,7 @@ void js_panel_window::ExecuteJsTask( EventId id, IEvent_JsTask& task )
             }
             else
             {
-                return !pMouseEvent->JsExecute( *pJsContainer_ ).value_or( false );
+                return !pEvent->JsExecute( *pJsContainer_ ).value_or( false );
             }
         }();
 
@@ -298,8 +317,8 @@ void js_panel_window::ExecuteJsTask( EventId id, IEvent_JsTask& task )
             EventManager::Get().PutEvent( wnd_,
                                           std::make_unique<Event_Mouse>(
                                               EventId::kMouseContextMenu,
-                                              pMouseEvent->GetX(),
-                                              pMouseEvent->GetY(),
+                                              pEvent->GetX(),
+                                              pEvent->GetY(),
                                               0 ),
                                           EventPriority::kInputHigh );
         }
@@ -442,12 +461,12 @@ std::optional<LRESULT> js_panel_window::process_main_messages( HWND hwnd, UINT m
     {
     case WM_CREATE:
     {
-        on_panel_create( hwnd );
+        OnCreate( hwnd );
         return 0;
     }
     case WM_DESTROY:
     {
-        on_panel_destroy();
+        OnDestroy();
         return 0;
     }
     default:
@@ -468,9 +487,10 @@ std::optional<LRESULT> js_panel_window::process_window_messages( UINT msg, WPARA
     {
     case WM_DISPLAYCHANGE:
     case WM_THEMECHANGED:
+    {
         ReloadScript();
         return 0;
-
+    }
     case WM_ERASEBKGND:
     {
         if ( settings_.isPseudoTransparent )
@@ -697,12 +717,20 @@ std::optional<LRESULT> js_panel_window::process_window_messages( UINT msg, WPARA
     }
     case WM_SETFOCUS:
     {
-        on_focus( true );
+        EventManager::Get().PutEvent( wnd_,
+                                      std::make_unique<Event_Focus>(
+                                          EventId::kInputFocus,
+                                          true ),
+                                      EventPriority::kInputHigh );
         return std::nullopt;
     }
     case WM_KILLFOCUS:
     {
-        on_focus( false );
+        EventManager::Get().PutEvent( wnd_,
+                                      std::make_unique<Event_Focus>(
+                                          EventId::kInputFocus,
+                                          false ),
+                                      EventPriority::kInputHigh );
         return std::nullopt;
     }
     default:
@@ -1306,7 +1334,7 @@ void js_panel_window::OpenDefaultContextManu( int x, int y )
     ExecuteContextMenu( ret, base_id );
 }
 
-void js_panel_window::on_panel_create( HWND hWnd )
+void js_panel_window::OnCreate( HWND hWnd )
 {
     wnd_ = hWnd;
     hDc_ = wnd_.GetDC();
@@ -1325,7 +1353,7 @@ void js_panel_window::on_panel_create( HWND hWnd )
     LoadScript( true );
 }
 
-void js_panel_window::on_panel_destroy()
+void js_panel_window::OnDestroy()
 {
     // Careful when changing invocation order here!
 
@@ -1337,12 +1365,6 @@ void js_panel_window::on_panel_destroy()
 
     DeleteDrawContext();
     ReleaseDC( wnd_, hDc_ );
-}
-
-void js_panel_window::on_js_task( CallbackData& callbackData )
-{
-    auto& data = callbackData.GetData<std::shared_ptr<mozjs::JsAsyncTask>>();
-    pJsContainer_->InvokeJsAsyncTask( *std::get<0>( data ) );
 }
 
 void js_panel_window::on_drag_drop( LPARAM lp )
@@ -1375,20 +1397,6 @@ void js_panel_window::on_drag_over( LPARAM lp )
                                        actionParams->pt,
                                        actionParams->keyState,
                                        actionParams->actionParams );
-}
-
-void js_panel_window::on_focus( bool isFocused )
-{
-    if ( isFocused )
-    {
-        selectionHolder_ = ui_selection_manager::get()->acquire();
-    }
-    else
-    {
-        selectionHolder_.release();
-    }
-    pJsContainer_->InvokeJsCallback( "on_focus",
-                                     static_cast<bool>( isFocused ) );
 }
 
 void js_panel_window::on_notify_data( WPARAM wp, LPARAM lp )
