@@ -70,6 +70,8 @@ enum class EventId
     // ui
     kUiColoursChanged,
     kUiFontChanged,
+    // window
+    kWndPaint
 };
 
 const std::unordered_map<EventId, qwr::u8string> kCallbackIdToName = {
@@ -132,6 +134,8 @@ const std::unordered_map<EventId, qwr::u8string> kCallbackIdToName = {
     // ui
     { EventId::kUiColoursChanged, "colours_changed" },
     { EventId::kUiFontChanged, "font_changed" },
+    // window
+    { EventId::kWndPaint, "paint" },
 };
 
 enum class EventPriority
