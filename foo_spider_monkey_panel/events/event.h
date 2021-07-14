@@ -3,9 +3,15 @@
 namespace smp::panel
 {
 
+class js_panel_window;
+
+}
+
+namespace smp
+{
+
 class Event_Mouse;
 class Event_Focus;
-class js_panel_window;
 
 enum class EventId
 {
@@ -170,7 +176,7 @@ class Runnable
 {
 public:
     virtual ~Runnable() = default;
-    virtual void Run( js_panel_window& panelWindow ) = 0;
+    virtual void Run( panel::js_panel_window& panelWindow ) = 0;
 };
 
 class EventBase
@@ -178,8 +184,14 @@ class EventBase
 public:
     virtual ~EventBase() = default;
 
-    virtual Event_Mouse* AsMouseEvent() = 0;
-    virtual Event_Focus* AsFocusEvent() = 0;
+    virtual Event_Mouse* AsMouseEvent()
+    {
+        return nullptr;
+    };
+    virtual Event_Focus* AsFocusEvent()
+    {
+        return nullptr;
+    };
 };
 
-} // namespace smp::panel
+} // namespace smp
