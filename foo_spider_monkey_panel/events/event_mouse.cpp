@@ -29,6 +29,11 @@ std::optional<bool> Event_Mouse::JsExecute( mozjs::JsContainer& jsContainer )
     return jsContainer.InvokeJsCallback<bool>( callbackName, x_, y_, mask_ );
 }
 
+Event_Mouse* Event_Mouse::AsMouseEvent()
+{
+    return this;
+}
+
 int32_t Event_Mouse::GetX() const
 {
     return x_;
